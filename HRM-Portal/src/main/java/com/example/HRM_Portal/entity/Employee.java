@@ -40,7 +40,15 @@ public class Employee {
     @Column(nullable = false)
     private String address;
 
-//    @Lob
-//    @Column(name = "resume", columnDefinition = "bytea")
-//    private byte[] resume; // Resume stored as binary data
+    @Lob
+    @Column(name = "resume")
+    private byte[] resume; // Store the resume as a byte array
+
+    @Lob
+    @Column(name = "aadhar_card")
+    private byte[] aadharCard; // Store the Aadhar card as a byte array
+
+    @Lob
+    @Column(name = "pan_card")
+    private byte[] panCard; // Store the PAN card as a byte array
 }

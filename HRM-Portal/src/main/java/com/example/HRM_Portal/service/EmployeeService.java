@@ -1,11 +1,10 @@
 package com.example.HRM_Portal.service;
 
 import com.example.HRM_Portal.entity.Employee;
-
 import com.example.HRM_Portal.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import jakarta.validation.constraints.Pattern;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ public class EmployeeService {
         employeeRepository.deleteById(id);
     }
 
-    public Employee getEmployeeByEmpId(@Pattern(regexp = "DS[0-9]{3}", message = "Employee ID must be in the format DS000 to DS999") String empId) {
+    public Employee getEmployeeByEmpId(String empId) {
         return employeeRepository.findByEmpId(empId);
     }
 }
