@@ -26,7 +26,7 @@ public class Employee {
     private String email;
 
     @Column(nullable = false)
-    private String role;
+    private String department;
 
     @Column(nullable = false)
     private String dob; // Consider using LocalDate
