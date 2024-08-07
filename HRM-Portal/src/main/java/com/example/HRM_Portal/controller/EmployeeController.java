@@ -41,7 +41,7 @@ public class EmployeeController {
     public ResponseEntity<Employee> createEmployee(
             @Valid @RequestParam("name") String name,
             @Valid @RequestParam("email") String email,
-            @Valid @RequestParam("role") String role,
+            @Valid @RequestParam("department") String department,
             @Valid @RequestParam("dob") String dob,
             @Valid @RequestParam("phoneNumber") String phoneNumber,
             @Valid @RequestParam("baseSalary") Double baseSalary,
@@ -55,7 +55,7 @@ public class EmployeeController {
         employee.setEmpId(empId);
         employee.setName(name);
         employee.setEmail(email);
-        employee.setRole(role);
+        employee.setDepartment(department);
         employee.setDob(dob);
         employee.setPhoneNumber(phoneNumber);
         employee.setBaseSalary(baseSalary);
@@ -85,7 +85,7 @@ public class EmployeeController {
             @PathVariable Long id,
             @RequestParam("name") String name,
             @RequestParam("email") String email,
-            @RequestParam("role") String role,
+            @RequestParam("department") String department,
             @RequestParam("dob") String dob,
             @RequestParam("phoneNumber") String phoneNumber,
             @RequestParam("baseSalary") Double baseSalary,
@@ -103,7 +103,7 @@ public class EmployeeController {
         employee.setEmpId(empId);
         employee.setName(name);
         employee.setEmail(email);
-        employee.setRole(role);
+        employee.setDepartment(department);
         employee.setDob(dob);
         employee.setPhoneNumber(phoneNumber);
         employee.setBaseSalary(baseSalary);
