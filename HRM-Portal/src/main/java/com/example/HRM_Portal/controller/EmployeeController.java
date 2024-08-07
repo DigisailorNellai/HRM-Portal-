@@ -1,7 +1,6 @@
 package com.example.HRM_Portal.controller;
 
 import com.example.HRM_Portal.entity.Employee;
-
 import com.example.HRM_Portal.service.EmployeeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
@@ -47,7 +46,10 @@ public class EmployeeController {
             @Valid @RequestParam("phoneNumber") String phoneNumber,
             @Valid @RequestParam("baseSalary") Double baseSalary,
             @Valid @RequestParam("address") String address,
-            @Valid @RequestParam("empId") @Pattern(regexp = "DS[0-9]{3}", message = "Employee ID must be in the format DS000 to DS999") String empId) throws IOException {
+            @Valid @RequestParam("empId") @Pattern(regexp = "DS[0-9]{3}", message = "Employee ID must be in the format DS000 to DS999") String empId,
+            @RequestParam(value = "resume", required = false) MultipartFile resumeFile,
+            @RequestParam(value = "aadharCard", required = false) MultipartFile aadharCardFile,
+            @RequestParam(value = "panCard", required = false) MultipartFile panCardFile) throws IOException {
 
         Employee employee = new Employee();
         employee.setEmpId(empId);
@@ -58,6 +60,16 @@ public class EmployeeController {
         employee.setPhoneNumber(phoneNumber);
         employee.setBaseSalary(baseSalary);
         employee.setAddress(address);
+
+        if (resumeFile != null && !resumeFile.isEmpty()) {
+            employee.setResume(resumeFile.getBytes());
+        }
+        if (aadharCardFile != null && !aadharCardFile.isEmpty()) {
+            employee.setAadharCard(aadharCardFile.getBytes());
+        }
+        if (panCardFile != null && !panCardFile.isEmpty()) {
+            employee.setPanCard(panCardFile.getBytes());
+        }
 
         try {
             Employee savedEmployee = employeeService.createOrUpdateEmployee(employee);
@@ -79,7 +91,9 @@ public class EmployeeController {
             @RequestParam("baseSalary") Double baseSalary,
             @RequestParam("address") String address,
             @RequestParam("empId") @Pattern(regexp = "DS[0-9]{3}", message = "Employee ID must be in the format DS000 to DS999") String empId,
-            @RequestParam(value = "resume", required = false) MultipartFile resumeFile) throws IOException {
+            @RequestParam(value = "resume", required = false) MultipartFile resumeFile,
+            @RequestParam(value = "aadharCard", required = false) MultipartFile aadharCardFile,
+            @RequestParam(value = "panCard", required = false) MultipartFile panCardFile) throws IOException {
 
         Employee employee = employeeService.getEmployeeById(id);
         if (employee == null) {
@@ -94,6 +108,16 @@ public class EmployeeController {
         employee.setPhoneNumber(phoneNumber);
         employee.setBaseSalary(baseSalary);
         employee.setAddress(address);
+
+        if (resumeFile != null && !resumeFile.isEmpty()) {
+            employee.setResume(resumeFile.getBytes());
+        }
+        if (aadharCardFile != null && !aadharCardFile.isEmpty()) {
+            employee.setAadharCard(aadharCardFile.getBytes());
+        }
+        if (panCardFile != null && !panCardFile.isEmpty()) {
+            employee.setPanCard(panCardFile.getBytes());
+        }
 
         try {
             Employee updatedEmployee = employeeService.createOrUpdateEmployee(employee);
