@@ -15,7 +15,6 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/employee")
 public class EmployeeController {
 
     @Autowired
@@ -26,13 +25,13 @@ public class EmployeeController {
         return employeeService.getAllEmployees();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("employee/{id}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id);
         return employee != null ? ResponseEntity.ok(employee) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/all")
+    @GetMapping("employees")
     public ResponseEntity<List<Employee>> viewAllEmployees() {
         List<Employee> employees = employeeService.getAllEmployees();
         if (employees.isEmpty()) {
@@ -84,7 +83,7 @@ public class EmployeeController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("employee/{id}")
     public ResponseEntity<Employee> updateEmployee(
             @PathVariable Long id,
             @RequestParam("name") String name,
@@ -132,7 +131,7 @@ public class EmployeeController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("employee/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
         try {
             Employee employee = employeeService.getEmployeeById(id);
@@ -148,7 +147,7 @@ public class EmployeeController {
         }
     }
 
-    @GetMapping("/{id}/resume")
+    @GetMapping("employee/{id}/resume")
     public ResponseEntity<byte[]> viewResume(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee == null || employee.getResume() == null) {
@@ -160,7 +159,7 @@ public class EmployeeController {
                 .body(employee.getResume());
     }
 
-    @GetMapping("/{id}/pan")
+    @GetMapping("employee/{id}/pan")
     public ResponseEntity<byte[]> viewPanCard(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee == null || employee.getPanCard() == null) {
@@ -172,7 +171,7 @@ public class EmployeeController {
                 .body(employee.getPanCard());
     }
 
-    @GetMapping("/{id}/aadhar")
+    @GetMapping("employee/{id}/aadhar")
     public ResponseEntity<byte[]> viewAadharCard(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee == null || employee.getAadharCard() == null) {
