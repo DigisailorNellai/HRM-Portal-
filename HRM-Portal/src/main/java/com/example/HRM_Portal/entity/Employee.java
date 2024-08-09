@@ -1,5 +1,6 @@
 package com.example.HRM_Portal.entity;
 
+import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.*;
