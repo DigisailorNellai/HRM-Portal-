@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.*;
 import lombok.Data;
 
+
 @Entity
 @Table(name = "employee")
 @Data
@@ -46,9 +47,9 @@ public class Employee {
 
     @Lob
     @Column(name = "aadhar_card")
-    private byte[] aadharCard; // Store the Aadhar card as a byte array
+    private byte[] aadharCard;
 
     @Lob
     @Column(name = "pan_card")
-    private byte[] panCard; // Store the PAN card as a byte array
+    private byte[] panCard;
 }
