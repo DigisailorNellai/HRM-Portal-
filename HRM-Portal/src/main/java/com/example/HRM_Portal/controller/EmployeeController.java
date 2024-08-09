@@ -13,8 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/employees")
+@RequestMapping("/employee")
 public class EmployeeController {
 
     @Autowired
@@ -31,10 +32,13 @@ public class EmployeeController {
         return employee != null ? ResponseEntity.ok(employee) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/empId/{empId}")
-    public ResponseEntity<Employee> getEmployeeByEmpId(@PathVariable @Pattern(regexp = "DS[0-9]{3}", message = "Employee ID must be in the format DS000 to DS999") String empId) {
-        Employee employee = employeeService.getEmployeeByEmpId(empId);
-        return employee != null ? ResponseEntity.ok(employee) : ResponseEntity.notFound().build();
+    @GetMapping("/all")
+    public ResponseEntity<List<Employee>> viewAllEmployees() {
+        List<Employee> employees = employeeService.getAllEmployees();
+        if (employees.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(employees);
     }
 
     @PostMapping
@@ -129,13 +133,54 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
         try {
+            Employee employee = employeeService.getEmployeeById(id);
+            if (employee == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found with ID: " + id);
+            }
+
             employeeService.deleteEmployee(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Employee deleted successfully with ID: " + id);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the employee.");
         }
+    }
+
+    @GetMapping("/{id}/resume")
+    public ResponseEntity<byte[]> viewResume(@PathVariable Long id) {
+        Employee employee = employeeService.getEmployeeById(id);
+        if (employee == null || employee.getResume() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "inline; filename=resume.pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(employee.getResume());
+    }
+
+    @GetMapping("/{id}/pan")
+    public ResponseEntity<byte[]> viewPanCard(@PathVariable Long id) {
+        Employee employee = employeeService.getEmployeeById(id);
+        if (employee == null || employee.getPanCard() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "inline; filename=pan_card.pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(employee.getPanCard());
+    }
+
+    @GetMapping("/{id}/aadhar")
+    public ResponseEntity<byte[]> viewAadharCard(@PathVariable Long id) {
+        Employee employee = employeeService.getEmployeeById(id);
+        if (employee == null || employee.getAadharCard() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "inline; filename=aadhar_card.pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(employee.getAadharCard());
     }
 }
