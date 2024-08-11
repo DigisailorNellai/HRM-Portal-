@@ -5,14 +5,17 @@ import com.example.HRM_Portal.service.EmployeeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-
 
 @RestController
 public class EmployeeController {
@@ -20,9 +23,16 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    @GetMapping
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
+    @GetMapping("/employees")
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        List<Employee> employees = employeeService.getAllEmployees();
+        if (employees.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(employees);
     }
 
     @GetMapping("employee/{id}")
@@ -31,16 +41,7 @@ public class EmployeeController {
         return employee != null ? ResponseEntity.ok(employee) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("employees")
-    public ResponseEntity<List<Employee>> viewAllEmployees() {
-        List<Employee> employees = employeeService.getAllEmployees();
-        if (employees.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(employees);
-    }
-
-    @PostMapping
+    @PostMapping("/employee")
     public ResponseEntity<Employee> createEmployee(
             @Valid @RequestParam("name") String name,
             @Valid @RequestParam("email") String email,
@@ -65,13 +66,16 @@ public class EmployeeController {
         employee.setAddress(address);
 
         if (resumeFile != null && !resumeFile.isEmpty()) {
-            employee.setResume(resumeFile.getBytes());
+            String resumePath = saveFile(resumeFile);
+            employee.setResumePath(resumePath);
         }
         if (aadharCardFile != null && !aadharCardFile.isEmpty()) {
-            employee.setAadharCard(aadharCardFile.getBytes());
+            String aadharCardPath = saveFile(aadharCardFile);
+            employee.setAadharCardPath(aadharCardPath);
         }
         if (panCardFile != null && !panCardFile.isEmpty()) {
-            employee.setPanCard(panCardFile.getBytes());
+            String panCardPath = saveFile(panCardFile);
+            employee.setPanCardPath(panCardPath);
         }
 
         try {
@@ -113,13 +117,16 @@ public class EmployeeController {
         employee.setAddress(address);
 
         if (resumeFile != null && !resumeFile.isEmpty()) {
-            employee.setResume(resumeFile.getBytes());
+            String resumePath = saveFile(resumeFile);
+            employee.setResumePath(resumePath);
         }
         if (aadharCardFile != null && !aadharCardFile.isEmpty()) {
-            employee.setAadharCard(aadharCardFile.getBytes());
+            String aadharCardPath = saveFile(aadharCardFile);
+            employee.setAadharCardPath(aadharCardPath);
         }
         if (panCardFile != null && !panCardFile.isEmpty()) {
-            employee.setPanCard(panCardFile.getBytes());
+            String panCardPath = saveFile(panCardFile);
+            employee.setPanCardPath(panCardPath);
         }
 
         try {
@@ -148,38 +155,51 @@ public class EmployeeController {
     }
 
     @GetMapping("employee/{id}/resume")
-    public ResponseEntity<byte[]> viewResume(@PathVariable Long id) {
+    public ResponseEntity<byte[]> viewResume(@PathVariable Long id) throws IOException {
         Employee employee = employeeService.getEmployeeById(id);
-        if (employee == null || employee.getResume() == null) {
+        if (employee == null || employee.getResumePath() == null) {
             return ResponseEntity.notFound().build();
         }
+        Path filePath = Paths.get(employee.getResumePath());
+        byte[] resume = Files.readAllBytes(filePath);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "inline; filename=resume.pdf")
                 .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
-                .body(employee.getResume());
+                .body(resume);
     }
 
     @GetMapping("employee/{id}/pan")
-    public ResponseEntity<byte[]> viewPanCard(@PathVariable Long id) {
+    public ResponseEntity<byte[]> viewPanCard(@PathVariable Long id) throws IOException {
         Employee employee = employeeService.getEmployeeById(id);
-        if (employee == null || employee.getPanCard() == null) {
+        if (employee == null || employee.getPanCardPath() == null) {
             return ResponseEntity.notFound().build();
         }
+        Path filePath = Paths.get(employee.getPanCardPath());
+        byte[] panCard = Files.readAllBytes(filePath);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "inline; filename=pan_card.pdf")
                 .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
-                .body(employee.getPanCard());
+                .body(panCard);
     }
 
     @GetMapping("employee/{id}/aadhar")
-    public ResponseEntity<byte[]> viewAadharCard(@PathVariable Long id) {
+    public ResponseEntity<byte[]> viewAadharCard(@PathVariable Long id) throws IOException {
         Employee employee = employeeService.getEmployeeById(id);
-        if (employee == null || employee.getAadharCard() == null) {
+        if (employee == null || employee.getAadharCardPath() == null) {
             return ResponseEntity.notFound().build();
         }
+        Path filePath = Paths.get(employee.getAadharCardPath());
+        byte[] aadharCard = Files.readAllBytes(filePath);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "inline; filename=aadhar_card.pdf")
                 .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
-                .body(employee.getAadharCard());
+                .body(aadharCard);
+    }
+
+    private String saveFile(MultipartFile file) throws IOException {
+        String filename = file.getOriginalFilename();
+        Path filePath = Paths.get(uploadDir, filename);
+        Files.write(filePath, file.getBytes());
+        return filePath.toString();
     }
 }
