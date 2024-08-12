@@ -28,6 +28,9 @@ public class Employee {
     private String email;
 
     @Column(nullable = false)
+    private String gender;
+
+    @Column(nullable = false)
     private String department;
 
     @Column(nullable = false)

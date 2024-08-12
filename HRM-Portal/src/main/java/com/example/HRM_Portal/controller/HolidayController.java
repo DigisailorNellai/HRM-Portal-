@@ -6,34 +6,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-        import java.util.List;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/holidays")
 public class HolidayController {
 
     @Autowired
     private HolidayService holidayService;
 
-    @PostMapping
+    @PostMapping("/holiday")
     public HolidayEntity createHoliday(@RequestBody HolidayEntity holiday) {
         return holidayService.saveHoliday(holiday);
     }
 
-    @PostMapping("/bulk")
+    @PostMapping("/holidays")
     public List<HolidayEntity> createHolidays(@RequestBody List<HolidayEntity> holidays) {
         return holidayService.saveHolidays(holidays);
     }
 
-    @GetMapping
+    @GetMapping("/holidays")
     public List<HolidayEntity> getHolidays() {
         return holidayService.getHolidays();
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/holiday/{id}")
+    public ResponseEntity<HolidayEntity> updateHoliday(@PathVariable Long id, @RequestBody HolidayEntity holidayDetails) {
+        HolidayEntity updatedHoliday = holidayService.updateHoliday(id, holidayDetails);
+        return ResponseEntity.ok(updatedHoliday);
+    }
+
+    @DeleteMapping("/holiday/{id}")
     public void deleteHoliday(@PathVariable Long id) {
         holidayService.deleteHoliday(id);
 
 
- }
+    }
 }

@@ -4,9 +4,9 @@ import com.example.HRM_Portal.entity.HolidayEntity;
 import com.example.HRM_Portal.repository.HolidayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HolidayService {
@@ -26,9 +26,21 @@ public class HolidayService {
         return holidayRepository.findAll();
     }
 
+    public HolidayEntity updateHoliday(Long id, HolidayEntity holidayDetails) {
+        Optional<HolidayEntity> optionalHoliday = holidayRepository.findById(id);
+        if (optionalHoliday.isPresent()) {
+            HolidayEntity holiday = optionalHoliday.get();
+            holiday.setName(holidayDetails.getName());
+            holiday.setDate(holidayDetails.getDate());
+            holiday.setDay(holidayDetails.getDay());
+            holiday.setDescription(holidayDetails.getDescription());
+            return holidayRepository.save(holiday);
+        } else {
+            throw new RuntimeException("Holiday not found with id " + id);
+        }
+    }
+
     public void deleteHoliday(Long id) {
         holidayRepository.deleteById(id);
- }
-
-
+    }
 }

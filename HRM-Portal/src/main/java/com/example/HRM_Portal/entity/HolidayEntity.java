@@ -28,4 +28,4 @@ public class HolidayEntity {
     private LocalDate date;
     private String day;
     private String description;
-    }
+}

@@ -40,10 +40,11 @@ public class EmployeeController {
         return ResponseEntity.ok(employees);
     }
 
-    @PostMapping
+    @PostMapping("employee")
     public ResponseEntity<Employee> createEmployee(
             @Valid @RequestParam("name") String name,
             @Valid @RequestParam("email") String email,
+            @Valid @RequestParam("gender") String gender,
             @Valid @RequestParam("department") String department,
             @Valid @RequestParam("dob") String dob,
             @Valid @RequestParam("phoneNumber") String phoneNumber,
@@ -58,6 +59,7 @@ public class EmployeeController {
         employee.setEmpId(empId);
         employee.setName(name);
         employee.setEmail(email);
+        employee.setGender(gender);
         employee.setDepartment(department);
         employee.setDob(dob);
         employee.setPhoneNumber(phoneNumber);
@@ -88,6 +90,7 @@ public class EmployeeController {
             @PathVariable Long id,
             @RequestParam("name") String name,
             @RequestParam("email") String email,
+            @RequestParam("gender") String gender,
             @RequestParam("department") String department,
             @RequestParam("dob") String dob,
             @RequestParam("phoneNumber") String phoneNumber,
@@ -106,6 +109,7 @@ public class EmployeeController {
         employee.setEmpId(empId);
         employee.setName(name);
         employee.setEmail(email);
+        employee.setGender(gender);
         employee.setDepartment(department);
         employee.setDob(dob);
         employee.setPhoneNumber(phoneNumber);
