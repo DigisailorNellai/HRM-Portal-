@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.*;
 import lombok.Data;
 
+
 @Entity
 @Table(name = "employee")
 @Data
@@ -41,12 +42,15 @@ public class Employee {
     @Column(nullable = false)
     private String address;
 
-    @Column(name = "resume_path")
-    private String resumePath; // Store the resume file path
+    @Lob
+    @Column(name = "resume")
+    private byte[] resume; // Store the resume as a byte array
 
-    @Column(name = "aadhar_card_path")
-    private String aadharCardPath; // Store the Aadhar card file path
+    @Lob
+    @Column(name = "aadhar_card")
+    private byte[] aadharCard;
 
-    @Column(name = "pan_card_path")
-    private String panCardPath; // Store the PAN card file path
+    @Lob
+    @Column(name = "pan_card")
+    private byte[] panCard;
 }
