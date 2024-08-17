@@ -37,7 +37,6 @@ public class EmployeeController {
             @Valid @RequestParam("phoneNumber") String phoneNumber,
             @Valid @RequestParam("baseSalary") Double baseSalary,
             @Valid @RequestParam("address") String address,
-            @RequestParam("empId") @Pattern(regexp = "DS[0-9]{3}", message = "Employee ID must be in the format DS000 to DS999") String empId,
             @RequestParam(value = "resume", required = false) MultipartFile resumeFile,
             @RequestParam(value = "aadharCard", required = false) MultipartFile aadharCardFile,
             @RequestParam(value = "panCard", required = false) MultipartFile panCardFile,
@@ -45,7 +44,6 @@ public class EmployeeController {
             @RequestParam("businessId") String businessId) throws IOException {
 
         Employee employee = new Employee();
-        employee.setEmpId(empId);
         employee.setName(name);
         employee.setEmail(email);
         employee.setGender(gender);
@@ -73,7 +71,6 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
     @PutMapping("/employee/{id}")
     public ResponseEntity<Employee> updateEmployee(
             @PathVariable Long id,
