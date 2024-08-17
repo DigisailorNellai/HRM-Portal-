@@ -33,10 +33,24 @@ public class EmployeeService {
         return employeeRepository.findByIdAndOurUsers(id, ourUsers).orElse(null);
     }
 
+
     @Transactional
     public Employee createOrUpdateEmployee(Employee employee, UUID businessId) {
+        // Fetch the business details using the correct method
         OurUsers ourUsers = ourUserDetailsService.getUserByBusinessId(businessId);
+
+        // Generate empId based on the first letter of the company name
+        String firstLetter = ourUsers.getCompanyName().substring(0, 1).toUpperCase();
+        String maxEmpId = employeeRepository.findMaxEmpIdStartingWith(firstLetter);
+
+        int nextId = maxEmpId == null ? 1 : Integer.parseInt(maxEmpId.substring(1)) + 1;
+        String generatedEmpId = String.format("%s%03d", firstLetter, nextId);
+
+        // Set the generated empId
+        employee.setEmpId(generatedEmpId);
         employee.setOurUsers(ourUsers);
+
+        // Save or update the employee
         return employeeRepository.save(employee);
     }
 
