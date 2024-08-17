@@ -18,7 +18,7 @@ public class ReqRes {
     private String token;
     private String refreshToken;
     private String expirationTime;
-    private String name;
+    private String companyName;
     private String city;
     private String role;
     private String email;

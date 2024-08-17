@@ -1,11 +1,8 @@
 package com.example.HRM_Portal.service;
 
-import com.example.HRM_Portal.config.JWTAuthFilter;
 import com.example.HRM_Portal.dto.ReqRes;
 import com.example.HRM_Portal.entity.OurUsers;
 import com.example.HRM_Portal.repository.UsersRepo;
-import com.example.HRM_Portal.service.JWTUtils;
-import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,21 +12,24 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UsersManagementService {
 
     @Autowired
     private UsersRepo usersRepo;
+
     @Autowired
     private JWTUtils jwtUtils;
+
     @Autowired
     private AuthenticationManager authenticationManager;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-    public ReqRes register(ReqRes registrationRequest){
+    public ReqRes register(ReqRes registrationRequest) {
         ReqRes resp = new ReqRes();
 
         try {
@@ -37,28 +37,24 @@ public class UsersManagementService {
             ourUser.setEmail(registrationRequest.getEmail());
             ourUser.setCity(registrationRequest.getCity());
             ourUser.setRole(registrationRequest.getRole());
-            ourUser.setName(registrationRequest.getName());
+            ourUser.setCompanyName(registrationRequest.getCompanyName());
             ourUser.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             OurUsers ourUsersResult = usersRepo.save(ourUser);
 
-            // Debugging: Log the role value before setting
-            System.out.println("Role from request: " + registrationRequest.getRole());
-
-            if (ourUsersResult.getId()>0) {
-                resp.setOurUsers((ourUsersResult));
+            if (ourUsersResult != null) {
+                resp.setOurUsers(ourUsersResult);
                 resp.setMessage("User Saved Successfully");
                 resp.setStatusCode(200);
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             resp.setStatusCode(500);
             resp.setError(e.getMessage());
         }
         return resp;
     }
 
-
-    public ReqRes login(ReqRes loginRequest){
+    public ReqRes login(ReqRes loginRequest) {
         ReqRes response = new ReqRes();
         try {
             authenticationManager
@@ -74,20 +70,16 @@ public class UsersManagementService {
             response.setExpirationTime("24Hrs");
             response.setMessage("Successfully Logged In");
 
-        }catch (Exception e){
+        } catch (Exception e) {
             response.setStatusCode(500);
             response.setMessage(e.getMessage());
         }
         return response;
     }
 
-
-
-
-
-    public ReqRes refreshToken(ReqRes refreshTokenRequest){
+    public ReqRes refreshToken(ReqRes refreshTokenRequest) {
         ReqRes response = new ReqRes();
-        try{
+        try {
             String ourEmail = jwtUtils.extractUsername(refreshTokenRequest.getToken());
             OurUsers users = usersRepo.findByEmail(ourEmail).orElseThrow();
             if (jwtUtils.isTokenValid(refreshTokenRequest.getToken(), users)) {
@@ -98,16 +90,12 @@ public class UsersManagementService {
                 response.setExpirationTime("24Hr");
                 response.setMessage("Successfully Refreshed Token");
             }
-            response.setStatusCode(200);
-            return response;
-
-        }catch (Exception e){
+        } catch (Exception e) {
             response.setStatusCode(500);
             response.setMessage(e.getMessage());
-            return response;
         }
+        return response;
     }
-
 
     public ReqRes getAllUsers() {
         ReqRes reqRes = new ReqRes();
@@ -122,22 +110,6 @@ public class UsersManagementService {
                 reqRes.setStatusCode(404);
                 reqRes.setMessage("No users found");
             }
-            return reqRes;
-        } catch (Exception e) {
-            reqRes.setStatusCode(500);
-            reqRes.setMessage("Error occurred: " + e.getMessage());
-            return reqRes;
-        }
-    }
-
-
-    public ReqRes getUsersById(Integer id) {
-        ReqRes reqRes = new ReqRes();
-        try {
-            OurUsers usersById = usersRepo.findById(id).orElseThrow(() -> new RuntimeException("User Not found"));
-            reqRes.setOurUsers(usersById);
-            reqRes.setStatusCode(200);
-            reqRes.setMessage("Users with id '" + id + "' found successfully");
         } catch (Exception e) {
             reqRes.setStatusCode(500);
             reqRes.setMessage("Error occurred: " + e.getMessage());
@@ -145,13 +117,26 @@ public class UsersManagementService {
         return reqRes;
     }
 
-
-    public ReqRes deleteUser(Integer userId) {
+    public ReqRes getUsersById(UUID businessId) {  // Changed from Integer to UUID
         ReqRes reqRes = new ReqRes();
         try {
-            Optional<OurUsers> userOptional = usersRepo.findById(userId);
+            OurUsers usersById = usersRepo.findById(businessId).orElseThrow(() -> new RuntimeException("User Not found"));
+            reqRes.setOurUsers(usersById);
+            reqRes.setStatusCode(200);
+            reqRes.setMessage("Users with id '" + businessId + "' found successfully");
+        } catch (Exception e) {
+            reqRes.setStatusCode(500);
+            reqRes.setMessage("Error occurred: " + e.getMessage());
+        }
+        return reqRes;
+    }
+
+    public ReqRes deleteUser(UUID businessId) {  // Changed from Integer to UUID
+        ReqRes reqRes = new ReqRes();
+        try {
+            Optional<OurUsers> userOptional = usersRepo.findById(businessId);
             if (userOptional.isPresent()) {
-                usersRepo.deleteById(userId);
+                usersRepo.deleteById(businessId);
                 reqRes.setStatusCode(200);
                 reqRes.setMessage("User deleted successfully");
             } else {
@@ -165,18 +150,17 @@ public class UsersManagementService {
         return reqRes;
     }
 
-    public ReqRes updateUser(Integer userId, OurUsers updatedUser) {
+    public ReqRes updateUser(UUID businessId, OurUsers updatedUser) {  // Changed from Integer to UUID
         ReqRes reqRes = new ReqRes();
         try {
-            Optional<OurUsers> userOptional = usersRepo.findById(userId);
+            Optional<OurUsers> userOptional = usersRepo.findById(businessId);
             if (userOptional.isPresent()) {
                 OurUsers existingUser = userOptional.get();
-                // Update fields if new values are present in updatedUser
                 if (updatedUser.getEmail() != null) {
                     existingUser.setEmail(updatedUser.getEmail());
                 }
-                if (updatedUser.getName() != null) {
-                    existingUser.setName(updatedUser.getName());
+                if (updatedUser.getCompanyName() != null) {
+                    existingUser.setCompanyName(updatedUser.getCompanyName());
                 }
                 if (updatedUser.getCity() != null) {
                     existingUser.setCity(updatedUser.getCity());
@@ -203,8 +187,7 @@ public class UsersManagementService {
         return reqRes;
     }
 
-
-    public ReqRes getMyInfo(String email){
+    public ReqRes getMyInfo(String email) {
         ReqRes reqRes = new ReqRes();
         try {
             Optional<OurUsers> userOptional = usersRepo.findByEmail(email);
@@ -214,14 +197,13 @@ public class UsersManagementService {
                 reqRes.setMessage("successful");
             } else {
                 reqRes.setStatusCode(404);
-                reqRes.setMessage("User not found for update");
+                reqRes.setMessage("User not found");
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             reqRes.setStatusCode(500);
             reqRes.setMessage("Error occurred while getting user info: " + e.getMessage());
         }
         return reqRes;
-
     }
 }

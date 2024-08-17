@@ -1,59 +1,66 @@
 package com.example.HRM_Portal.entity;
-
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.*;
 import lombok.Data;
-
+import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "employee")
 @Data
-public class Employee {
+public class Employee implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    @Pattern(regexp = "DS[0-9]{3}", message = "Employee ID must be in the format DS000 to DS999")
+    @Column(name = "emp_id", unique = true, nullable = false)
     private String empId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    @Email
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "gender")
     private String gender;
 
-    @Column(nullable = false)
+    @Column(name = "department")
     private String department;
 
-    @Column(nullable = false)
-    private String dob; // Consider using LocalDate
+    @Column(name = "dob")
+    private String dob;
 
-    @Column(nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column(name = "base_salary")
     private Double baseSalary;
 
-    @Column(nullable = false)
+    @Column(name = "address")
     private String address;
 
-    @Lob
     @Column(name = "resume")
-    private byte[] resume; // Store the resume as a byte array
-
     @Lob
+    private byte[] resume;
+
     @Column(name = "aadhar_card")
+    @Lob
     private byte[] aadharCard;
 
-    @Lob
     @Column(name = "pan_card")
+    @Lob
     private byte[] panCard;
+
+    @ElementCollection
+    @CollectionTable(name = "collected_documents", joinColumns = @JoinColumn(name = "employee_id"))
+    @Column(name = "document_name")
+    private List<String> collectedDocuments;
+
+    @ManyToOne
+    @JoinColumn(name = "business_id", referencedColumnName = "businessId")
+    private OurUsers ourUsers;
+
+    // Getters and Setters
 }
