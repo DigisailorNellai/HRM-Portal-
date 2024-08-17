@@ -1,15 +1,15 @@
 package com.example.HRM_Portal.entity;
 
 import jakarta.persistence.*;
-        import lombok.Data;
+import jakarta.persistence.Entity;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import jakarta.persistence.Entity;
-
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -17,18 +17,17 @@ import jakarta.persistence.Entity;
 public class OurUsers implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID businessId;  // Corrected the spelling of businessId
     private String email;
-    private String name;
+    private String companyName;
     private String password;
     private String city;
     private String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_"+role));
-//        return Collections.emptyList();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override
@@ -37,7 +36,7 @@ public class OurUsers implements UserDetails {
     }
 
     @Override
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
