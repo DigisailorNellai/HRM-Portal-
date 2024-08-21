@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,43 +22,43 @@ public class TaskManagementService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public List<TaskManagementDto> getTasksByProjectId(Long projectId) {
-        return taskRepository.findByProjectId(projectId)
+    public List<TaskManagementDto> getTasksByProjectIdAndBusinessId(Long projectId, String businessId) {
+        return taskRepository.findByProjectIdAndBusinessId(projectId, UUID.fromString(businessId))
                 .stream()
                 .map(this::convertToTaskDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<TaskManagementDto> getTaskById(Long taskId) {
-        return taskRepository.findById(taskId)
+    public Optional<TaskManagementDto> getTaskByIdAndBusinessId(Long taskId, String businessId) {
+        return taskRepository.findByIdAndBusinessId(taskId, UUID.fromString(businessId))
                 .map(this::convertToTaskDTO);
     }
 
-    public TaskManagementDto saveTask(TaskManagementEntity task) {
+    public TaskManagementDto saveTask(TaskManagementEntity task, String businessId) {
+        task.setBusinessId(UUID.fromString(businessId));
         TaskManagementEntity savedTask = taskRepository.save(task);
         return convertToTaskDTO(savedTask);
     }
 
-    public Optional<ProjectDto> getProjectById(Long projectId) {
-        return projectRepository.findById(projectId)
-                .map(this::convertToProjectDTO);
-    }
-
-    public ProjectDto saveProject(ProjectEntity project) {
-        ProjectEntity savedProject = projectRepository.save(project);
-        return convertToProjectDTO(savedProject);
-    }
-    public TaskManagementDto updateTask(Long taskId, TaskManagementEntity updatedTask) {
-        // Save updated task directly (assuming taskId is set in the controller)
+    public TaskManagementDto updateTask(Long taskId, TaskManagementEntity updatedTask, String businessId) {
+        updatedTask.setBusinessId(UUID.fromString(businessId));
         TaskManagementEntity savedTask = taskRepository.save(updatedTask);
         return convertToTaskDTO(savedTask);
     }
+    public void deleteTaskByIdAndBusinessId(Long taskId, String businessId) {
+        UUID businessUUID = UUID.fromString(businessId);
 
-    public void deleteTask(Long taskId) {
-        taskRepository.deleteById(taskId);
+        // Fetch the task by ID and business ID
+        Optional<TaskManagementEntity> taskEntity = taskRepository.findByIdAndBusinessId(taskId, businessUUID);
+
+        // If the task exists, delete it
+        taskEntity.ifPresent(taskRepository::delete);
     }
 
-    public TaskManagementDto convertToTaskDTO(TaskManagementEntity task) {
+
+
+
+    TaskManagementDto convertToTaskDTO(TaskManagementEntity task) {
         return new TaskManagementDto(
                 task.getId(),
                 task.getSummary(),
@@ -65,17 +66,10 @@ public class TaskManagementService {
                 task.getAssignee(),
                 task.getDueDate(),
                 task.getProject().getId(),
-                task.getProject().getName()
+                task.getProject().getName(),// Ensure the project ID (Long) is used here
+                task.getProject().getBusinessId()  // Use this for UUID type
+
+
         );
     }
-
-    private ProjectDto convertToProjectDTO(ProjectEntity project) {
-        List<TaskManagementDto> tasks = project.getTasks()
-                .stream()
-                .map(this::convertToTaskDTO)
-                .collect(Collectors.toList());
-
-        return new ProjectDto(project.getId(), project.getName(), tasks);
-    }
 }
-
