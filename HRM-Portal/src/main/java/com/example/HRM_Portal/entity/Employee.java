@@ -1,7 +1,9 @@
 package com.example.HRM_Portal.entity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -62,5 +64,8 @@ public class Employee implements Serializable {
     @JoinColumn(name = "business_id", referencedColumnName = "businessId")
     private OurUsers ourUsers;
 
-    // Getters and Setters
+    @Column(name = "team_name", nullable = true)
+    private String teamName; // New attribute for team name
+
+    // Getters and Setters (if not using Lombok)
 }

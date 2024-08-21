@@ -4,13 +4,15 @@ import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.access.method.P;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.UUID;
+@NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
@@ -30,19 +32,25 @@ public class TaskManagementEntity {
     private LocalDate dueDate;
 
     private String projectName;
+
+    @Column(nullable = false)
+    private UUID businessId;
+
     @ManyToOne
     @JoinColumn(name = "project_id")
     private ProjectEntity project;
 
-    // Constructors
-    public TaskManagementEntity() {}
 
-    public TaskManagementEntity(String summary, String status, String assignee, LocalDate dueDate,String projectName) {
+
+    // Constructors
+
+    public TaskManagementEntity(String summary, String status, String assignee, LocalDate dueDate,String projectName,UUID businessId) {
         this.summary = summary;
         this.status = status;
         this.assignee = assignee;
         this.dueDate = dueDate;
         this.projectName=projectName;
+        this.businessId=businessId;
     }
 
 }

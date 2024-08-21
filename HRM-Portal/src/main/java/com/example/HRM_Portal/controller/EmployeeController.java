@@ -71,40 +71,43 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PutMapping("/employee/{id}")
     public ResponseEntity<Employee> updateEmployee(
-            @PathVariable Long id,
-            @RequestParam("name") String name,
-            @RequestParam("email") String email,
-            @RequestParam("gender") String gender,
-            @RequestParam("department") String department,
-            @RequestParam("dob") String dob,
-            @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam("baseSalary") Double baseSalary,
-            @RequestParam("address") String address,
-            @RequestParam("empId") @Pattern(regexp = "DS[0-9]{3}", message = "Employee ID must be in the format DS000 to DS999") String empId,
+            @RequestParam("businessId") String businessId,
+            @PathVariable("id") Long id, // Change to @PathVariable
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "gender", required = false) String gender,
+            @RequestParam(value = "department", required = false) String department,
+            @RequestParam(value = "dob", required = false) String dob,
+            @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+            @RequestParam(value = "baseSalary", required = false) Double baseSalary,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "teamName" ,required = false) String teamName,
             @RequestParam(value = "resume", required = false) MultipartFile resumeFile,
             @RequestParam(value = "aadharCard", required = false) MultipartFile aadharCardFile,
             @RequestParam(value = "panCard", required = false) MultipartFile panCardFile,
-            @RequestParam(value = "collectedDocuments", required = false) List<String> collectedDocuments,
-            @RequestParam("businessId") String businessId) throws IOException {
+            @RequestParam(value = "collectedDocuments", required = false) List<String> collectedDocuments) throws IOException {
 
         Employee employee = employeeService.getEmployeeById(id, UUID.fromString(businessId));
         if (employee == null) {
             return ResponseEntity.notFound().build();
         }
 
-        employee.setEmpId(empId);
-        employee.setName(name);
-        employee.setEmail(email);
-        employee.setGender(gender);
-        employee.setDepartment(department);
-        employee.setDob(dob);
-        employee.setPhoneNumber(phoneNumber);
-        employee.setBaseSalary(baseSalary);
-        employee.setAddress(address);
-        employee.setCollectedDocuments(collectedDocuments);
+        // Update only the provided fields
+        if (name != null) employee.setName(name);
+        if (email != null) employee.setEmail(email);
+        if (gender != null) employee.setGender(gender);
+        if (department != null) employee.setDepartment(department);
+        if (dob != null) employee.setDob(dob);
+        if (phoneNumber != null) employee.setPhoneNumber(phoneNumber);
+        if (baseSalary != null) employee.setBaseSalary(baseSalary);
+        if (address != null) employee.setAddress(address);
+        if (teamName!=null) employee .setTeamName(teamName);
+        if (collectedDocuments != null) employee.setCollectedDocuments(collectedDocuments);
 
+        // Update documents if provided
         if (resumeFile != null && !resumeFile.isEmpty()) {
             employee.setResume(resumeFile.getBytes());
         }
